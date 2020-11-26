@@ -1,0 +1,30 @@
+name: 'Terraform'
+
+on: [push, pull_request]
+
+jobs: 
+  terraform: 
+    name: Build EC2 instance 
+    runs-on: ubuntu-latest 
+    steps: 
+    - uses: actions/checkout@v2 
+    - uses: hashicorp/setup-terraform@v1
+      with: 
+        terraform_version: 0.12.25
+
+    - name: terraform fmt 
+      id: fmt 
+      run: terraform fmt -check 
+      continue-on-error: true 
+
+    - name: Terraform tfsec with reviewdog 
+      uses: reviewdog/action-tfsec@v1.0.0
+    
+    - name: Terraform init 
+      id: init 
+      run: terraform init 
+
+    - name: Terraform Validate 
+      id: Validate
+      run: terraform validate -no-color 
+
